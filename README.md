@@ -62,7 +62,7 @@ longitude
 ```
  
 
-#### GET /users/relate_to/<facebook_id>
+#### GET /users/monitor/<facebook_id>
 
 Action:
 L’utilisateur loggué sera prévenu lorsque l’utilisateur identifié par facebook_id s’approche de lui
