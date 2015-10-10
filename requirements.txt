@@ -3,5 +3,5 @@ Flask-SQLAlchemy==2.0
 gunicorn
 psycopg2
 Flask-Migrate==1.6.0
-python-gcm==0.2
+git+git://github.com/geeknam/python-gcm.git
 haversine==0.4.2
