@@ -39,3 +39,6 @@ class Activity(db.Model):
     disrupted_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=True)
     ended_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=True)
     disrupted_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+
+    def __init__(self, user_id):
+        self.user_id = user_id
