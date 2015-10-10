@@ -16,6 +16,8 @@ def create():
     user.name = request.form["name"]
     user.token_id = request.form["token_id"]
     user.facebook_id = request.form["facebook_id"]
+    user.gcm = request.form["gcm"]
+
     db.session.add(user)
     db.session.commit()
 
