@@ -13,4 +13,20 @@ python app.py create
 ## Endpoints
 
 ### POST /users/create
-Payload : ```token_id```, ```facebook_id```, ```name``` (nom et prénom)
+Payload : 
+
+```
+token_id
+facebook_id
+name
+```
+
+### POST /house/create
+Payload : 
+
+```
+facebook_id
+name
+latitude
+longitude
+```
