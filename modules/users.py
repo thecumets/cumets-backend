@@ -16,6 +16,8 @@ def create():
     user.name = request.form["name"]
     user.token_id = request.form["token_id"]
     user.facebook_id = request.form["facebook_id"]
+    user.gcm = request.form["gcm"]
+
     db.session.add(user)
     db.session.commit()
 
@@ -38,6 +40,20 @@ def relate_to(facebook_id):
     db.session.commit()
 
     return jsonify({"relation": "success"})
+
+
+@bp.route("/location", methods=["POST"])
+@requires_user
+def update_location():
+    user = User.query.get(session["user_id"])
+
+    user.last_latitude = float(request.form["latitude"])
+    user.last_longitude = float(request.form["longitude"])
+
+    db.session.add(user)
+    db.session.commit()
+
+    return jsonify({"location": "update"})
 
 
 @bp.route("/login", methods=["POST"])

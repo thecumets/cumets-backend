@@ -25,6 +25,7 @@ class User(db.Model):
     facebook_id = db.Column(db.String, nullable=False, index=True)
     last_latitude = db.Column(db.Float, nullable=True)
     last_longitude = db.Column(db.Float, nullable=True)
+    gcm = db.Column(db.String, nullable=True)
 
     activities = db.relationship('Activity', backref='user', lazy='dynamic', foreign_keys="Activity.user_id")
     relationships = db.relationship("User", secondary=user_to_relationship,
