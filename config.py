@@ -5,4 +5,4 @@ BASE_DIRECTORY = path.abspath(path.dirname(__file__))
 DEBUG = True
 
 # Database details
-SQLALCHEMY_DATABASE_URI = 'postgresql://cumets:cumets@localhost:5432/cumets'
+SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
