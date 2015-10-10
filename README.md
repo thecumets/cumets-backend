@@ -88,6 +88,7 @@ Payload:
 token_id
 facebook_id
 name
+gcm
 ```
 
 ### Activity
