@@ -1,16 +1,19 @@
-from flask import Blueprint, request, jsonify, abort
+from flask import Blueprint, request, jsonify, abort, session
 from database import db
 from models import House, User
+from util import requires_user
 
 
 bp = Blueprint("house", __name__, url_prefix="/house")
 
 
 @bp.route("/create", methods=["POST"])
+@requires_user
 def create():
-    owner = User.query.filter(User.facebook_id == request.form["facebook_id"]).first()
-    if owner is None:
-        abort(400)
+    owner = User.query.get(session["user_id"])
+
+    if owner.house is not None:
+        abort(412)
 
     house = House()
     house.name = request.form["name"]
@@ -27,16 +30,34 @@ def create():
     return jsonify({"creation": "success"})
 
 
-@bp.route("/edit")
-def edit():
-    pass
+@bp.route("/join/<int:house_id>")
+@requires_user
+def join(house_id):
+    user = User.query.get(session["user_id"])
+    house = House.get(house_id)
+    if house is None:
+        abort(400)
+
+    user.house = house
+    db.session.add(user)
+    db.session.commit()
+
+    return jsonify({"addition": "success"})
 
 
-@bp.route("/delete/<int:house_id>")
-def delete(house_id):
-    house = House.query.get(house_id)
+@bp.route("/delete")
+@requires_user
+def delete():
+    user = User.query.get(session["user_id"])
+    if user.house is None:
+        abort(412)
+
+    house = House.query.get(user.house.id)
     if house is None:
         abort(404)
+
+    if house.owner != user:
+        abort(401)
 
     db.session.delete(house)
     db.session.commit()

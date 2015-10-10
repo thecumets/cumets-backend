@@ -1,6 +1,7 @@
-from flask import Blueprint, request, abort, jsonify
+from flask import Blueprint, request, abort, jsonify, session
 from database import db
 from models import User
+from util import requires_user
 
 bp = Blueprint("users", __name__, url_prefix="/users")
 
@@ -18,11 +19,22 @@ def create():
     db.session.add(user)
     db.session.commit()
 
-    return jsonify({
-        "creation": "success"
-    })
+    return jsonify({"creation": "success"})
 
 
-@bp.route("/login")
+@bp.route("/login", methods=["POST"])
 def login():
-    pass
+    user = User.query.filter(User.facebook_id == request.form["facebook_id"]).first()
+    if user is None:
+        abort(400)
+
+    session["user_id"] = user.id
+
+    return jsonify({"login": "success"})
+
+
+@bp.route("/logout", methods=["GET"])
+@requires_user
+def logout():
+    session.pop("user_id", None)
+    return jsonify({"logout": "success"})
