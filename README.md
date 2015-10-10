@@ -16,43 +16,39 @@ python app.py create
 
 #### POST /users/login
 
-Payload :
+Action:
+Loggue l’utilisateur identifié par son facebook_id
+
+Payload:
 ```
 facebook_id
 ```
 
 #### GET /users/logout
 
+Action:
+Déloggue l’utilisateur identifié
+
+Pas de payload
+ 
+
+#### GET /users/relate_to/<user_id>
+
+Action:
+L’utilisateur loggué sera prévenu lorsque l’utilisateur identifié par user_id s’approche de lui
+
 Pas de payload 
 
 
 #### POST /users/create
-Payload : 
+
+Action:
+Crée un nouvel utilisateur
+
+Payload: 
 
 ```
 token_id
 facebook_id
 name
 ```
-
-### House
-
-### POST /house/create
-
-Crée une maison dont le propriétaire est l’utilisateur loggué
-
-Payload : 
-
-```
-name
-latitude
-longitude
-```
-
-### GET /house/join/<house_id>
-
-L’utilisateur loggué rejoint la maison qui a l’id house_id.
-
-### GET /house/delete
-
-L’utilisateur détruit sa maison, uniquement s’il en est le propriétaire.
