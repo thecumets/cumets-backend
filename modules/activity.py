@@ -51,7 +51,6 @@ def start():
     return jsonify({"start": "success"})
 
 
-
 @bp.route("/update", methods=["GET"])
 @requires_user
 def update():

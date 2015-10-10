@@ -1,4 +1,4 @@
-from flask import Blueprint, request, abort, jsonify, session
+from flask import Blueprint, request, abort, jsonify
 from database import db
 from models import Subscription
 
