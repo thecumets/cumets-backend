@@ -36,7 +36,6 @@ def register_blueprints(package_name=None, package_path="."):
 
 register_blueprints("modules", ["modules"])
 
-
 @app.route("/")
 def home():
     return jsonify({"test": "home"})
