@@ -12,10 +12,12 @@ class User(db.Model):
     name = db.Column(db.String, nullable=False)
     token_id = db.Column(db.String, nullable=False, index=True)
     facebook_id = db.Column(db.String, nullable=False, index=True)
-    last_latitude = db.Column(db.Integer, nullable=True)
-    last_longitude = db.Column(db.Integer, nullable=True)
+    last_latitude = db.Column(db.Float, nullable=True)
+    last_longitude = db.Column(db.Float, nullable=True)
+    house_id = db.Column(db.Integer, db.ForeignKey('house.id'), nullable=True)
 
     activities = db.relationship('Activity', backref='user', lazy='dynamic', foreign_keys="Activity.user_id")
+    house = db.relationship('House', foreign_keys='User.house_id')
 
 
 class Activity(db.Model):
@@ -34,5 +36,6 @@ class House(db.Model):
 
     id = db.Column(db.Integer, nullable=False, primary_key=True)
     name = db.Column(db.String, nullable=False)
-    latitude = db.Column(db.Integer, nullable=False)
-    longitude = db.Column(db.Integer, nullable=False)
+    owner = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    latitude = db.Column(db.Float, nullable=False)
+    longitude = db.Column(db.Float, nullable=False)
