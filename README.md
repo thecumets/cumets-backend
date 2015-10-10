@@ -9,3 +9,8 @@ Pour créer la base de données, il faut lancer
 ```
 python app.py create
 ```
+
+## Endpoints
+
+### POST /users/create
+Payload : ```token_id```, ```facebook_id```, ```name``` (nom et prénom)
