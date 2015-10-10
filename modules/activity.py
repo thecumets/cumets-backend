@@ -4,9 +4,26 @@ from models import User, Activity
 from util import requires_user
 from sqlalchemy import and_
 import datetime
+from haversine import haversine
+from gcm_client import gcm
 
 
 bp = Blueprint("activity", __name__, url_prefix="/activity")
+DISTANCE_THRESHOLD = 50
+
+
+def get_nearest_relation(user):
+    min_distance = 10000000
+    nearest = None
+    user_loc = (user.last_latitude, user.last_longitude)
+    for relation in user.relationships:
+        loc = (relation.last_latitude, relation.last_longitude)
+        distance = haversine(user_loc, loc) / 1000.
+        if distance < DISTANCE_THRESHOLD:
+            min_distance = distance
+            nearest = relation
+
+    return {"user": nearest, "distance": min_distance}
 
 
 @bp.route("/start")
@@ -19,6 +36,22 @@ def start():
         abort(412)
 
     activity = Activity(user.id)
+
+    nearest = get_nearest_relation(user)
+    if nearest["distance"] < DISTANCE_THRESHOLD:
+        activity.disrupt(nearest["user"])
+        db.session.add(activity)
+        db.session.commit()
+
+        return jsonify({
+            "start": "failure",
+            "reason": "Someone is close",
+            "distance": nearest["distance"]
+        })
+
+    reg_ids = [relation.gcm for relation in user.relationships if relation.gcm is not None]
+    gcm.json_request(registration_ids=reg_ids, data={"logging": "start"})
+
     db.session.add(activity)
     db.session.commit()
     db.session.flush()
@@ -43,6 +76,8 @@ def stop(activity_id):
         abort(401)
 
     current_activity.ended_at = datetime.datetime.utcnow()
+    reg_ids = [relation.gcm for relation in user.relationships if relation.gcm is not None]
+    gcm.json_request(registration_ids=reg_ids, data={"logging": "stop"})
     db.session.add(current_activity)
     db.session.commit()
 
