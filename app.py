@@ -2,12 +2,13 @@ import pkgutil
 import os
 from flask import Flask, Blueprint, jsonify
 from flask.ext.sqlalchemy import SQLAlchemy
+import sys
 
-db = SQLAlchemy()
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
-db.init_app(app)
-db.app = app
+db = SQLAlchemy(app)
+if len(sys.argv) == 2 and sys.argv[1] == "create":
+    db.create_all()
 
 
 def register_blueprints(package_name=None, package_path="."):
@@ -28,6 +29,7 @@ def register_blueprints(package_name=None, package_path="."):
                 app.register_blueprint(item)
 
 register_blueprints("modules", ["modules"])
+
 
 @app.route("/")
 def home():
