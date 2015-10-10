@@ -3,10 +3,10 @@ from datetime import datetime
 from database import db
 
 
-relationship = db.Table(
+user_to_relationship = db.Table(
     'relationships',
-    db.Column('user_id', db.Integer, db.ForeignKey('users.id')),
-    db.Column('relationship_id', db.Integer, db.ForeignKey('users.id'))
+    db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
+    db.Column('relationship_id', db.Integer, db.ForeignKey('users.id'), primary_key=True)
 )
 
 
@@ -23,7 +23,11 @@ class User(db.Model):
     last_longitude = db.Column(db.Float, nullable=True)
 
     activities = db.relationship('Activity', backref='user', lazy='dynamic', foreign_keys="Activity.user_id")
-    relationships = db.relationship('User', secondary=relationship, foreign_keys="relationships.user_id")
+    relationships = db.relationship("User", secondary=user_to_relationship,
+                                    primaryjoin=id == user_to_relationship.c.user_id,
+                                    secondaryjoin=id == user_to_relationship.c.relationship_id,
+                                    backref="other_relationships"
+                                    )
 
 
 class Activity(db.Model):
