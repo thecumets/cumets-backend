@@ -2,12 +2,19 @@ import pkgutil
 import os
 from flask import Flask, Blueprint, jsonify
 from database import db
+from flask.ext.script import Manager
+from flask.ext.migrate import Migrate, MigrateCommand
+
 
 app = Flask(__name__)
 app.config.from_object('config')
 app.secret_key = os.urandom(24)
 db.init_app(app)
 db.app = app
+migrate = Migrate(app, db)
+
+manager = Manager(app)
+manager.add_command('db', MigrateCommand)
 
 
 def register_blueprints(package_name=None, package_path="."):
@@ -43,4 +50,5 @@ if __name__ == "__main__":
         from models import *
         db.create_all()
     else:
-        app.run(debug=True, port=5000, host='0.0.0.0')
+        manager.run()
+        # app.run(debug=True, port=5000, host='0.0.0.0')
