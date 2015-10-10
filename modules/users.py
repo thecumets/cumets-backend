@@ -22,6 +22,24 @@ def create():
     return jsonify({"creation": "success"})
 
 
+@bp.route("/relate_to/<string:facebook_id>", methods=["GET"])
+@requires_user
+def relate_to(facebook_id):
+    user = User.query.get(session["user_id"])
+    relation = User.query.filter(User.facebook_id == facebook_id).first()
+    if relation is None:
+        abort(404)
+
+    if relation in user.relationships:
+        return jsonify({"relation": "already in relation"})
+
+    user.relationships.append(relation)
+    db.session.add(user)
+    db.session.commit()
+
+    return jsonify({"relation": "success"})
+
+
 @bp.route("/login", methods=["POST"])
 def login():
     user = User.query.filter(User.facebook_id == request.form["facebook_id"]).first()
