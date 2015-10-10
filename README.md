@@ -12,7 +12,21 @@ python app.py create
 
 ## Endpoints
 
-### POST /users/create
+### Users
+
+#### POST /users/login
+
+Payload :
+```
+facebook_id
+```
+
+#### GET /users/logout
+
+Pas de payload 
+
+
+#### POST /users/create
 Payload : 
 
 ```
@@ -21,12 +35,24 @@ facebook_id
 name
 ```
 
+### House
+
 ### POST /house/create
+
+Crée une maison dont le propriétaire est l’utilisateur loggué
+
 Payload : 
 
 ```
-facebook_id
 name
 latitude
 longitude
 ```
+
+### GET /house/join/<house_id>
+
+L’utilisateur loggué rejoint la maison qui a l’id house_id.
+
+### GET /house/delete
+
+L’utilisateur détruit sa maison, uniquement s’il en est le propriétaire.

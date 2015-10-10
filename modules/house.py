@@ -30,7 +30,7 @@ def create():
     return jsonify({"creation": "success"})
 
 
-@bp.route("/join/<int:house_id>")
+@bp.route("/join/<int:house_id>", methods=["GET"])
 @requires_user
 def join(house_id):
     user = User.query.get(session["user_id"])
@@ -45,7 +45,7 @@ def join(house_id):
     return jsonify({"addition": "success"})
 
 
-@bp.route("/delete")
+@bp.route("/delete", methods=["GET"])
 @requires_user
 def delete():
     user = User.query.get(session["user_id"])
