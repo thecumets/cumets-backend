@@ -10,8 +10,8 @@ def create():
     token_id = 0
     facebook_id = 0
     try:
-        token_id = int(request.form["token_id"])
-        facebook_id = int(request.form["facebook_id"])
+        token_id = str(request.form["token_id"])
+        facebook_id = str(request.form["facebook_id"])
     except ValueError:
         abort(400)
 
