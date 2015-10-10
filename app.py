@@ -1,6 +1,6 @@
 import pkgutil
 import os
-from flask import Flask, Blueprint
+from flask import Flask, Blueprint, jsonify
 
 
 # https://github.com/mattupstate/overholt/blob/master/overholt/helpers.py (MIT license)
@@ -30,8 +30,13 @@ def create_app():
     app.secret_key = os.urandom(24)
     register_blueprints(app, "modules", ["modules"])
 
+    @app.route("/")
+    def home():
+        return jsonify({"test": "home"})
+
     return app
 
 
 if __name__ == "__main__":
-    create_app().run(debug=True, port=5000)
+    app = create_app()
+    app.run(debug=True, port=5000)
