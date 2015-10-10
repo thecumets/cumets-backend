@@ -7,6 +7,8 @@ db = SQLAlchemy()
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
 db.init_app(app)
+db.app = app
+
 
 def register_blueprints(package_name=None, package_path="."):
     """Register all Blueprint instances on the specified Flask application found
@@ -30,6 +32,7 @@ register_blueprints("modules", ["modules"])
 @app.route("/")
 def home():
     return jsonify({"test": "home"})
+
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000, host='0.0.0.0')
