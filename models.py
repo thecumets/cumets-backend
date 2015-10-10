@@ -9,8 +9,8 @@ user_to_relationship = db.Table(
     db.Column('relationship_id', db.Integer, db.ForeignKey('users.id'), primary_key=True)
 )
 
-class Subsciption(db.Model):
-    __tablename__ = 'subsciption'
+class Subscription(db.Model):
+    __tablename__ = 'subscription'
     id = db.Column(db.Integer, nullable=False, primary_key=True)
     email = db.Column(db.String,nullable=False)
 
