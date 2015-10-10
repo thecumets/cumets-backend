@@ -4,3 +4,4 @@ gunicorn
 psycopg2
 Flask-Migrate==1.6.0
 python-gcm==0.2
+haversine==0.4.2
