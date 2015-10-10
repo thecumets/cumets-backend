@@ -47,12 +47,25 @@ Action:
 Déloggue l’utilisateur identifié
 
 Pas de payload.
- 
 
-#### GET /users/relate_to/<user_id>
+
+#### PUT /users/location
 
 Action:
-L’utilisateur loggué sera prévenu lorsque l’utilisateur identifié par user_id s’approche de lui
+Met à jour la position de l’utilisater loggué.
+
+Payload: 
+
+```
+latitude
+longitude
+```
+ 
+
+#### GET /users/relate_to/<facebook_id>
+
+Action:
+L’utilisateur loggué sera prévenu lorsque l’utilisateur identifié par facebook_id s’approche de lui
 
 Pas de payload.
 

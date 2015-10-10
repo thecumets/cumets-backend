@@ -42,7 +42,7 @@ def relate_to(facebook_id):
     return jsonify({"relation": "success"})
 
 
-@bp.route("/location", methods=["POST"])
+@bp.route("/location", methods=["PUT"])
 @requires_user
 def update_location():
     user = User.query.get(session["user_id"])
