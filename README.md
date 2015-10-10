@@ -10,6 +10,23 @@ Pour créer la base de données, il faut lancer
 python app.py create
 ```
 
+## Workflow
+
+Quand l’utilisateur veut commencer une activité, il fait une requête GET sur /activity/create.
+
+Les applis des personnes à surveiller sont notifiées via un message GCM {"logging": "start"}.
+Si leur GPS est éteint, leur appli envoie une requête PUT sur /users/location avec latitude=null et longitude=null.
+Si leur GPS est allumé, ils envoient régulièrement une requête PUT sur /users/location avec leur latitude et longitude.
+
+L’utilisateur en cours d’activité peut envoyer une requête GET sur /activity/update.
+Il reçoit :
+ * l’ID et la distance de la personne la plus proche, 
+ * la liste des personnes n’ayant pas updaté leur position depuis plus de 5 minutes,
+ * la liste des personnes avec GPS désactivé.
+
+Si l’utilisateur arrête l’activité parce qu’une personne est trop proche, il envoie un GET sur /activity/stop.
+Les personnes surveillées reçoivent un message GCM {"logging": "stop"}.
+
 ## Endpoints
 
 ### Users

@@ -47,8 +47,12 @@ def relate_to(facebook_id):
 def update_location():
     user = User.query.get(session["user_id"])
 
-    user.last_latitude = float(request.form["latitude"])
-    user.last_longitude = float(request.form["longitude"])
+    if request.form["latitude"] is not None and request.form["longitude"] is not None:
+        user.last_latitude = float(request.form["latitude"])
+        user.last_longitude = float(request.form["longitude"])
+    else:
+        user.last_latitude = None
+        user.last_longitude = None
 
     db.session.add(user)
     db.session.commit()
