@@ -9,6 +9,12 @@ user_to_relationship = db.Table(
     db.Column('relationship_id', db.Integer, db.ForeignKey('users.id'), primary_key=True)
 )
 
+email_preorder = db.Table(
+    'emails',
+    db.Column('email_id',db.Integer, nullable=False, primary_key=True),
+    db.Column('email', db.String, nullable=False)
+)
+
 
 class User(db.Model):
     __tablename__ = 'users'
