@@ -1,7 +1,7 @@
 from flask import Blueprint
 
 
-bp = Blueprint("session", __name__, url_prefix="/session")
+bp = Blueprint("activity", __name__, url_prefix="/activity")
 
 
 @bp.route("/start")
