@@ -62,10 +62,17 @@ longitude
 ```
  
 
-#### GET /users/monitor/{facebook_id}
+#### PUT /users/monitor/{facebook_id}
 
 Action:
 L’utilisateur loggué sera prévenu lorsque l’utilisateur identifié par facebook_id s’approche de lui
+
+Pas de payload.
+
+#### DELETE /users/monitor/{facebook_id}
+
+Action:
+L’utilisateur loggué ne sera plus prévenu lorsque l’utilisateur identifié par facebook_id s’approche de lui
 
 Pas de payload.
 

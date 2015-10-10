@@ -24,7 +24,7 @@ def create():
     return jsonify({"creation": "success"})
 
 
-@bp.route("/monitor/<string:facebook_id>", methods=["GET"])
+@bp.route("/monitor/<string:facebook_id>", methods=["PUT"])
 @requires_user
 def monitor(facebook_id):
     user = User.query.get(session["user_id"])
@@ -39,7 +39,22 @@ def monitor(facebook_id):
     db.session.add(user)
     db.session.commit()
 
-    return jsonify({"relation": "success"})
+    return jsonify({"monitor": "success"})
+
+
+@bp.route("/monitor/<string:facebook_id>", methods=["DELETE"])
+@requires_user
+def unmonitor(facebook_id):
+    user = User.query.get(session["user_id"])
+    relation = User.query.filter(User.facebook_id == facebook_id).first()
+    if relation is None:
+        abort(404)
+
+    user.relationships.remove(relation)
+    db.session.add(user)
+    db.session.commit()
+
+    return jsonify({"unmonitor": "success"})
 
 
 @bp.route("/location", methods=["PUT"])
