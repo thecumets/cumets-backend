@@ -7,3 +7,6 @@ DEBUG = True
 
 # Database details
 SQLALCHEMY_DATABASE_URI = environ['DATABASE_URL']
+
+# GCM details
+GCM_ID = environ["GCM_KEY"] 
