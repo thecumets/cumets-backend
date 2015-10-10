@@ -29,7 +29,7 @@ facebook_id
 Action:
 Déloggue l’utilisateur identifié
 
-Pas de payload
+Pas de payload.
  
 
 #### GET /users/relate_to/<user_id>
@@ -37,7 +37,7 @@ Pas de payload
 Action:
 L’utilisateur loggué sera prévenu lorsque l’utilisateur identifié par user_id s’approche de lui
 
-Pas de payload 
+Pas de payload.
 
 
 #### POST /users/create
@@ -52,3 +52,35 @@ token_id
 facebook_id
 name
 ```
+
+### Activity
+
+#### GET /activity/start
+
+Action:
+L’utilisateur commence une activité, ses personnes à surveiller sont notifiées.
+
+Pas de payload.
+
+#### GET /activity/update
+
+Action:
+L’utilisateur reçoit le facebook_id et la distance la personne la plus proche.
+
+Pas de payload.
+ 
+
+#### GET /activity/disrupt
+
+Action:
+L’utilisateur arrête son activité parce que quelqu’un est trop proche.
+
+Pas de payload 
+
+
+#### GET /activity/stop
+
+Action:
+L’utilisateur arrête son activité car il a fini.
+
+Pas de payload.

@@ -16,6 +16,7 @@ def get_current_activity(user):
     current_activity = Activity.query(and_(Activity.user_id == user.id, Activity.ended_at == None)).first()
     return current_activity
 
+
 def get_nearest_relation(user):
     min_distance = 10000000
     nearest = None
@@ -30,7 +31,7 @@ def get_nearest_relation(user):
     return {"user": nearest, "distance": min_distance}
 
 
-@bp.route("/start")
+@bp.route("/start", methods=["GET"])
 @requires_user
 def start():
     user = User.query.get(session["user_id"])
@@ -46,17 +47,12 @@ def start():
 
     db.session.add(activity)
     db.session.commit()
-    db.session.flush()
-    db.session.refresh(activity)
 
-    return jsonify({
-        "start": "success",
-        "id": activity.id
-    })
+    return jsonify({"start": "success"})
 
 
 
-@bp.route("/update")
+@bp.route("/update", methods=["GET"])
 @requires_user
 def update():
     user = User.query.get(session["user_id"])
@@ -66,18 +62,33 @@ def update():
         abort(404)
 
     nearest = get_nearest_relation(user)
-    if nearest["distance"] < DISTANCE_THRESHOLD:
-        reg_ids = [relation.gcm for relation in user.relationships if relation.gcm is not None]
-        gcm.json_request(registration_ids=reg_ids, data={"logging": "stop"})
-        current_activity.disrupt(nearest["user"])
-        db.session.add(current_activity)
-        db.session.commit()
-        return jsonify({"activity": "stop"})
 
-    return jsonify({"distance": nearest["distance"]})
+    return jsonify({
+        "distance": nearest["distance"],
+        "user": nearest["user"].facebook_id
+    })
 
 
-@bp.route("/stop")
+@bp.route("/disrupt", methods=["GET"])
+@requires_user
+def disrupt():
+    user = User.query.get(session["user_id"])
+
+    current_activity = get_current_activity(user)
+    if current_activity is None:
+        abort(404)
+
+    nearest = get_nearest_relation(user)
+    reg_ids = [relation.gcm for relation in user.relationships if relation.gcm is not None]
+    gcm.json_request(registration_ids=reg_ids, data={"logging": "stop"})
+    current_activity.disrupt(nearest["user"])
+    db.session.add(current_activity)
+    db.session.commit()
+
+    return jsonify({"disrupt": "success"})
+
+
+@bp.route("/stop", methods=["GET"])
 @requires_user
 def stop():
     user = User.query.get(session["user_id"])
