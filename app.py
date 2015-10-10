@@ -26,14 +26,19 @@ def register_blueprints(app, package_name=None, package_path="."):
                 app.register_blueprint(item)
 
 
-def create_app():
+def create_app(create_database=False):
     """Creates an app by registering blueprints in the modules directory
     and loading the configuration
     """
     app = Flask(__name__)
+    app.config.from_object('config')
     app.secret_key = os.urandom(24)
     register_blueprints(app, "modules", ["modules"])
     db.init_app(app)
+    db.app = app
+
+    if create_database:
+        db.create_all()
 
     @app.route("/")
     def home():
