@@ -14,7 +14,7 @@ class User(db.Model):
     facebook_id = db.Column(db.String, nullable=False, index=True)
     last_latitude = db.Column(db.Float, nullable=True)
     last_longitude = db.Column(db.Float, nullable=True)
-    house_id = db.Column(db.Integer, db.ForeignKey('house.id'), nullable=True)
+    house_id = db.Column(db.Integer, db.ForeignKey('house.id', ondelete="SET NULL"), nullable=True)
 
     activities = db.relationship('Activity', backref='user', lazy='dynamic', foreign_keys="Activity.user_id")
     house = db.relationship('House', foreign_keys='User.house_id')

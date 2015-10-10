@@ -32,6 +32,13 @@ def edit():
     pass
 
 
-@bp.route("/delete")
-def delete():
-    pass
+@bp.route("/delete/<int:house_id>")
+def delete(house_id):
+    house = House.query.get(house_id)
+    if house is None:
+        abort(404)
+
+    db.session.delete(house)
+    db.session.commit()
+
+    return jsonify({"deletion": "success"})
