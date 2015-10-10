@@ -12,6 +12,10 @@ bp = Blueprint("activity", __name__, url_prefix="/activity")
 DISTANCE_THRESHOLD = 50
 
 
+def get_current_activity(user):
+    current_activity = Activity.query(and_(Activity.user_id == user.id, Activity.ended_at == None)).first()
+    return current_activity
+
 def get_nearest_relation(user):
     min_distance = 10000000
     nearest = None
@@ -31,23 +35,11 @@ def get_nearest_relation(user):
 def start():
     user = User.query.get(session["user_id"])
 
-    current_activity = Activity.query(and_(Activity.user_id == user.id, Activity.ended_at == None)).first()
+    current_activity = get_current_activity(user)
     if current_activity is not None:
         abort(412)
 
     activity = Activity(user.id)
-
-    nearest = get_nearest_relation(user)
-    if nearest["distance"] < DISTANCE_THRESHOLD:
-        activity.disrupt(nearest["user"])
-        db.session.add(activity)
-        db.session.commit()
-
-        return jsonify({
-            "start": "failure",
-            "reason": "Someone is close",
-            "distance": nearest["distance"]
-        })
 
     reg_ids = [relation.gcm for relation in user.relationships if relation.gcm is not None]
     gcm.json_request(registration_ids=reg_ids, data={"logging": "start"})
@@ -63,17 +55,36 @@ def start():
     })
 
 
-@bp.route("/stop/<int:activity_id>")
+
+@bp.route("/update")
 @requires_user
-def stop(activity_id):
+def update():
     user = User.query.get(session["user_id"])
 
-    current_activity = Activity.query.get(activity_id)
+    current_activity = get_current_activity(user)
     if current_activity is None:
         abort(404)
 
-    if current_activity.user != user:
-        abort(401)
+    nearest = get_nearest_relation(user)
+    if nearest["distance"] < DISTANCE_THRESHOLD:
+        reg_ids = [relation.gcm for relation in user.relationships if relation.gcm is not None]
+        gcm.json_request(registration_ids=reg_ids, data={"logging": "stop"})
+        current_activity.disrupt(nearest["user"])
+        db.session.add(current_activity)
+        db.session.commit()
+        return jsonify({"activity": "stop"})
+
+    return jsonify({"distance": nearest["distance"]})
+
+
+@bp.route("/stop")
+@requires_user
+def stop():
+    user = User.query.get(session["user_id"])
+
+    current_activity = get_current_activity(user)
+    if current_activity is None:
+        abort(404)
 
     current_activity.ended_at = datetime.datetime.utcnow()
     reg_ids = [relation.gcm for relation in user.relationships if relation.gcm is not None]

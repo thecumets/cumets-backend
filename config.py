@@ -9,4 +9,4 @@ DEBUG = True
 SQLALCHEMY_DATABASE_URI = environ['DATABASE_URL']
 
 # GCM details
-GCM_ID = environ["GCM_KEY"] 
+GCM_ID = environ["GCM_KEY"]
