@@ -1,14 +1,13 @@
 import pkgutil
 import os
 from flask import Flask, Blueprint, jsonify
-from flask.ext.sqlalchemy import SQLAlchemy
-import sys
+from database import db
 
 app = Flask(__name__)
+app.config.from_object('config')
 app.secret_key = os.urandom(24)
-db = SQLAlchemy(app)
-if len(sys.argv) == 2 and sys.argv[1] == "create":
-    db.create_all()
+db.init_app(app)
+db.app = app
 
 
 def register_blueprints(package_name=None, package_path="."):
@@ -37,4 +36,11 @@ def home():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5000, host='0.0.0.0')
+    import sys
+
+    if len(sys.argv) == 2 and sys.argv[1] == "create":
+        from database import db
+        from models import *
+        db.create_all()
+    else:
+        app.run(debug=True, port=5000, host='0.0.0.0')
