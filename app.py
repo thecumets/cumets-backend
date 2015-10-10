@@ -1,6 +1,10 @@
 import pkgutil
 import os
 from flask import Flask, Blueprint, jsonify
+from flask.ext.sqlalchemy import SQLAlchemy
+
+
+db = SQLAlchemy()
 
 
 # https://github.com/mattupstate/overholt/blob/master/overholt/helpers.py (MIT license)
@@ -29,6 +33,7 @@ def create_app():
     app = Flask(__name__)
     app.secret_key = os.urandom(24)
     register_blueprints(app, "modules", ["modules"])
+    db.init_app(app)
 
     @app.route("/")
     def home():
