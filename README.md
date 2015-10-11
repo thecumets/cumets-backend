@@ -31,20 +31,10 @@ Les personnes surveillées reçoivent un message GCM {"logging": "stop"}.
 
 ### Users
 
-#### POST /users/login
+#### GET /users/token
 
 Action:
-Loggue l’utilisateur identifié par son facebook_id
-
-Payload:
-```
-facebook_id
-```
-
-#### GET /users/logout
-
-Action:
-Déloggue l’utilisateur identifié
+Retourne un token valable 1 an.
 
 Pas de payload.
 

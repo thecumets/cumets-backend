@@ -1,7 +1,7 @@
-from flask import Blueprint, request, abort, jsonify, session
+from flask import Blueprint, request, abort, jsonify, session, g
 from database import db
 from models import User
-from util import requires_user
+from app import auth
 
 bp = Blueprint("users", __name__, url_prefix="/users")
 
@@ -18,14 +18,19 @@ def create():
     user.facebook_id = request.form["facebook_id"]
     user.gcm = request.form["gcm"]
 
+    user.hash_password(request.form["facebook_id"])
+
     db.session.add(user)
     db.session.commit()
 
-    return jsonify({"creation": "success"})
+    return jsonify({
+        "creation": "success",
+        "token": user.token.decode("ascii"),
+    })
 
 
 @bp.route("/monitor/<string:facebook_id>", methods=["PUT"])
-@requires_user
+@auth.login_required
 def monitor(facebook_id):
     user = User.query.get(session["user_id"])
     relation = User.query.filter(User.facebook_id == facebook_id).first()
@@ -43,7 +48,7 @@ def monitor(facebook_id):
 
 
 @bp.route("/monitor/<string:facebook_id>", methods=["DELETE"])
-@requires_user
+@auth.login_required
 def unmonitor(facebook_id):
     user = User.query.get(session["user_id"])
     relation = User.query.filter(User.facebook_id == facebook_id).first()
@@ -58,7 +63,7 @@ def unmonitor(facebook_id):
 
 
 @bp.route("/location", methods=["PUT"])
-@requires_user
+@auth.login_required
 def update_location():
     user = User.query.get(session["user_id"])
 
@@ -75,19 +80,8 @@ def update_location():
     return jsonify({"location": "update"})
 
 
-@bp.route("/login", methods=["POST"])
-def login():
-    user = User.query.filter(User.facebook_id == request.form["facebook_id"]).first()
-    if user is None:
-        abort(400)
-
-    session["user_id"] = user.id
-
-    return jsonify({"login": "success"})
-
-
-@bp.route("/logout", methods=["GET"])
-@requires_user
-def logout():
-    session.pop("user_id", None)
-    return jsonify({"logout": "success"})
+@bp.route("/token", methods=["GET"])
+@auth.login_required
+def token():
+    t = g.user.generate_auth_token()
+    return jsonify({'token': t.decode('ascii')})

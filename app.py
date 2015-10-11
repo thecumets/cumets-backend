@@ -1,6 +1,7 @@
 import pkgutil
+from flask.ext.httpauth import HTTPBasicAuth
 import os
-from flask import Flask, Blueprint, jsonify
+from flask import Flask, Blueprint, jsonify, g
 from database import db
 from flask.ext.script import Manager
 from flask.ext.migrate import Migrate, MigrateCommand
@@ -12,9 +13,24 @@ app.secret_key = os.urandom(24)
 db.init_app(app)
 db.app = app
 migrate = Migrate(app, db)
+auth = HTTPBasicAuth()
 
 manager = Manager(app)
 manager.add_command('db', MigrateCommand)
+
+
+@auth.verify_password
+def verify_password(facebook_id_or_token, password):
+    from models import User
+    # first try to authenticate by token
+    user = User.verify_auth_token(facebook_id_or_token)
+    if not user:
+        # try to authenticate with username/password
+        user = User.query.filter_by(facebook_id=facebook_id_or_token).first()
+        if not user or not user.verify_password(password):
+            return False
+    g.user = user
+    return True
 
 
 def register_blueprints(package_name=None, package_path="."):
@@ -35,6 +51,7 @@ def register_blueprints(package_name=None, package_path="."):
                 app.register_blueprint(item)
 
 register_blueprints("modules", ["modules"])
+
 
 @app.route("/")
 def home():

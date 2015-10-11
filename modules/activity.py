@@ -1,7 +1,7 @@
+from app import auth
 from flask import Blueprint, session, abort, jsonify
 from database import db
 from models import User, Activity
-from util import requires_user
 from sqlalchemy import and_
 from haversine import haversine
 from gcm_client import gcm
@@ -46,7 +46,7 @@ def get_relations_informations(user):
 
 
 @bp.route("/start", methods=["GET"])
-@requires_user
+@auth.login_required
 def start():
     user = User.query.get(session["user_id"])
 
@@ -66,7 +66,7 @@ def start():
 
 
 @bp.route("/update", methods=["GET"])
-@requires_user
+@auth.login_required
 def update():
     user = User.query.get(session["user_id"])
 
@@ -85,7 +85,7 @@ def update():
 
 
 @bp.route("/disrupt", methods=["GET"])
-@requires_user
+@auth.login_required
 def disrupt():
     user = User.query.get(session["user_id"])
 
@@ -104,7 +104,7 @@ def disrupt():
 
 
 @bp.route("/stop", methods=["GET"])
-@requires_user
+@auth.login_required
 def stop():
     user = User.query.get(session["user_id"])
 
