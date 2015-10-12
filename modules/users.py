@@ -11,7 +11,6 @@ def create():
     existing = User.query.filter(User.facebook_id == request.form["facebook_id"]).first()
     if existing is not None:
         existing.gcm = request.form["gcm"]
-        db.session.update(existing)
         db.session.commit()
         return jsonify({
             "creation": "success",
@@ -31,7 +30,7 @@ def create():
 
     return jsonify({
         "creation": "success",
-        "token": user.token.decode("ascii"),
+        "token": user.token#.decode("ascii"),
     })
 
 
