@@ -30,7 +30,7 @@ def create():
 
     return jsonify({
         "creation": "success",
-        "token": user.token#.decode("ascii"),
+        "token": user.token
     })
 
 

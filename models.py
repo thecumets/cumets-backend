@@ -78,5 +78,5 @@ class Activity(db.Model):
 
     def disrupt(self, disrupter):
         self.disrupted_by = disrupter
-        self.disrupted_at = datetime.datetime.utcnow()
-        self.ended_at = datetime.datetime.utcnow()
+        self.disrupted_at = datetime.utcnow()
+        self.ended_at = datetime.utcnow()

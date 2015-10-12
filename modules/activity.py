@@ -1,5 +1,5 @@
 from app import auth
-from flask import Blueprint, session, abort, jsonify
+from flask import Blueprint, session, abort, jsonify, request
 from database import db
 from models import User, Activity
 from sqlalchemy import and_
@@ -13,7 +13,8 @@ DISTANCE_THRESHOLD = 50
 
 
 def get_current_activity(user):
-    current_activity = Activity.query(and_(Activity.user_id == user.id, Activity.ended_at == None)).first()
+    current_activity = Activity.query.filter(Activity.user_id == user.id, Activity.ended_at == None).first()
+    #Activity.query(and_(Activity.user_id == user.id, Activity.ended_at == None)).first()
     return current_activity
 
 
@@ -46,9 +47,12 @@ def get_relations_informations(user):
 
 
 @bp.route("/start", methods=["GET"])
-@auth.login_required
+#@auth.login_required
 def start():
-    user = User.query.get(session["user_id"])
+    user = User.query.filter(User.token == request.headers.get("X-Auth-Token")).first()
+
+    if user is None:
+        abort(403)
 
     current_activity = get_current_activity(user)
     if current_activity is not None:
@@ -57,7 +61,9 @@ def start():
     activity = Activity(user.id)
 
     reg_ids = [relation.gcm for relation in user.relationships if relation.gcm is not None]
-    gcm.json_request(registration_ids=reg_ids, data={"logging": "start"})
+    
+    if len(reg_ids) > 0:
+        gcm.json_request(registration_ids=reg_ids, data={"logging": "start"})
 
     db.session.add(activity)
     db.session.commit()
@@ -66,9 +72,12 @@ def start():
 
 
 @bp.route("/update", methods=["GET"])
-@auth.login_required
+#@auth.login_required
 def update():
-    user = User.query.get(session["user_id"])
+    user = User.query.filter(User.token == request.headers.get("X-Auth-Token")).first()
+
+    if user is None:
+        abort(403)
 
     current_activity = get_current_activity(user)
     if current_activity is None:
@@ -76,18 +85,32 @@ def update():
 
     nearest = get_relations_informations(user)
 
-    return jsonify({
-        "distance": nearest["distance"],
-        "user": nearest["user"].facebook_id,
-        "no_gps": nearest["no_gps"],
-        "stale": nearest["stale"],
-    })
+    print(nearest)
+
+
+    if nearest["user"] is not None:
+        return jsonify({
+            "distance": nearest["distance"],
+            "user": nearest["user"].facebook_id,
+            "no_gps": nearest["no_gps"],
+            "stale": nearest["stale"],
+        })
+    else:
+        return jsonify({
+            "distance": nearest["distance"],
+            "user": nearest["user"],
+            "no_gps": nearest["no_gps"],
+            "stale": nearest["stale"]
+        })
 
 
 @bp.route("/disrupt", methods=["GET"])
-@auth.login_required
+#@auth.login_required
 def disrupt():
-    user = User.query.get(session["user_id"])
+    user = User.query.filter(User.token == request.headers.get("X-Auth-Token")).first()
+
+    if user is None:
+        abort(403)
 
     current_activity = get_current_activity(user)
     if current_activity is None:
@@ -95,7 +118,9 @@ def disrupt():
 
     nearest = get_relations_informations(user)
     reg_ids = [relation.gcm for relation in user.relationships if relation.gcm is not None]
-    gcm.json_request(registration_ids=reg_ids, data={"logging": "stop"})
+    if len(reg_ids) > 0:
+        gcm.json_request(registration_ids=reg_ids, data={"logging": "stop"})
+
     current_activity.disrupt(nearest["user"])
     db.session.add(current_activity)
     db.session.commit()
@@ -104,17 +129,23 @@ def disrupt():
 
 
 @bp.route("/stop", methods=["GET"])
-@auth.login_required
+#@auth.login_required
 def stop():
-    user = User.query.get(session["user_id"])
+    user = User.query.filter(User.token == request.headers.get("X-Auth-Token")).first()
+
+    if user is None:
+        abort(403)
 
     current_activity = get_current_activity(user)
     if current_activity is None:
         abort(404)
 
-    current_activity.ended_at = datetime.datetime.utcnow()
+    current_activity.ended_at = datetime.utcnow()
     reg_ids = [relation.gcm for relation in user.relationships if relation.gcm is not None]
-    gcm.json_request(registration_ids=reg_ids, data={"logging": "stop"})
+
+    if len(reg_ids) > 0:
+        gcm.json_request(registration_ids=reg_ids, data={"logging": "stop"})
+    
     db.session.add(current_activity)
     db.session.commit()
 
