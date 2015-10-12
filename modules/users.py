@@ -10,7 +10,12 @@ bp = Blueprint("users", __name__, url_prefix="/users")
 def create():
     existing = User.query.filter(User.facebook_id == request.form["facebook_id"]).first()
     if existing is not None:
-        abort(409)
+        existing.gcm = request.form["gcm"]
+        db.session.commit()
+        return jsonify({
+            "creation": "success",
+            "token": existing.token.decode("ascii")
+        })
 
     user = User()
     user.name = request.form["name"]
