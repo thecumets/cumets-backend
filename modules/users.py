@@ -14,7 +14,7 @@ def create():
         db.session.commit()
         return jsonify({
             "creation": "success",
-            "token": existing.token.decode("ascii")
+            "token": existing.token
         })
 
     user = User()
