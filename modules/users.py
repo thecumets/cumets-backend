@@ -35,9 +35,13 @@ def create():
 
 
 @bp.route("/monitor/<string:facebook_id>", methods=["PUT"])
-@auth.login_required
+#@auth.login_required
 def monitor(facebook_id):
-    user = User.query.get(session["user_id"])
+    user = User.query.filter(User.token == request.headers.get("X-Auth-Token")).first()
+
+    if user is None:
+        abort(403)
+
     relation = User.query.filter(User.facebook_id == facebook_id).first()
     if relation is None:
         abort(404)
@@ -53,9 +57,13 @@ def monitor(facebook_id):
 
 
 @bp.route("/monitor/<string:facebook_id>", methods=["DELETE"])
-@auth.login_required
+#@auth.login_required
 def unmonitor(facebook_id):
-    user = User.query.get(session["user_id"])
+    user = User.query.filter(User.token == request.headers.get("X-Auth-Token")).first()
+
+    if user is None:
+        abort(403)
+
     relation = User.query.filter(User.facebook_id == facebook_id).first()
     if relation is None:
         abort(404)
@@ -68,9 +76,12 @@ def unmonitor(facebook_id):
 
 
 @bp.route("/location", methods=["PUT"])
-@auth.login_required
+#@auth.login_required
 def update_location():
-    user = User.query.get(session["user_id"])
+    user = User.query.filter(User.token == request.headers.get("X-Auth-Token")).first()
+
+    if user is None:
+        abort(403)
 
     if request.form["latitude"] is not None and request.form["longitude"] is not None:
         user.last_latitude = float(request.form["latitude"])
@@ -86,7 +97,11 @@ def update_location():
 
 
 @bp.route("/token", methods=["GET"])
-@auth.login_required
+#@auth.login_required
 def token():
-    t = g.user.generate_auth_token()
-    return jsonify({'token': t.decode('ascii')})
+    user = User.query.filter(User.token == request.headers.get("X-Auth-Token")).first()
+
+    if user is None:
+        abort(403)
+
+    return jsonify({'token': user.generate_auth_token().decode('ascii')})
