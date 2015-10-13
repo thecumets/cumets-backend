@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 
 
 bp = Blueprint("activity", __name__, url_prefix="/activity")
-DISTANCE_THRESHOLD = 50
+DISTANCE_THRESHOLD = 10000
 
 
 def get_current_activity(user):
@@ -38,7 +38,7 @@ def get_relations_informations(user):
             continue
 
         # If the GPS is active and up to date, we test if the relation is the nearest.
-        distance = haversine(user_loc, loc) / 1000.
+        distance = haversine(user_loc, loc) * 1000.
         if distance < DISTANCE_THRESHOLD:
             min_distance = distance
             nearest = relation
