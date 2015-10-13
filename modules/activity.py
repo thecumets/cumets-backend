@@ -19,7 +19,7 @@ def get_current_activity(user):
 
 
 def get_relations_informations(user):
-    min_distance = 10000
+    min_distance = None
     nearest = None
     stale = []
     no_gps = []
