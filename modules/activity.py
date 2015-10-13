@@ -26,7 +26,7 @@ def get_relations_informations(user):
     user_loc = (user.last_latitude, user.last_longitude)
     for relation in user.relationships:
         # If too old, we add the relation to the stale list
-        time_diff = (datetime.utcnow() - relation.last_updated) / timedelta(minutes=1)
+        time_diff = (datetime.utcnow() - relation.updated_at) / timedelta(minutes=1)
         if time_diff > 5:
             stale.append(relation.facebook_id)
             continue
