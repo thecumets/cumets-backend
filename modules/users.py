@@ -90,7 +90,7 @@ def update_location():
         user.last_latitude = None
         user.last_longitude = None
 
-    db.session.add(user)
+    #db.session.add(user)
     db.session.commit()
 
     return jsonify({"location": "update"})
