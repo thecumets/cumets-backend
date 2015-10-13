@@ -56,7 +56,7 @@ def start():
 
     current_activity = get_current_activity(user)
     if current_activity is not None:
-        abort(412)
+        return jsonify({"start": "success"})
 
     activity = Activity(user.id)
 
